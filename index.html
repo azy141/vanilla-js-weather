@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather</title>
+    <style>
+      .main-content {
+        text-align: center;
+      }
+
+      .current-weather-data {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+      }
+
+      .weekly-weather-data {
+        display: flex;
+      }
+
+      .weather {
+        padding: 20px;
+      }
+
+      .weather-description {
+        text-transform: capitalize;
+        display: flex;
+        justify-content: center;
+      }
+
+      .weekly-weather-data {
+        display: flex;
+        justify-content: center;
+      }
+
+      .weather-icon {
+        width: 60%;
+      }
+      .weather-high-low-temps {
+        width: 40%;
+        margin-top: 20px;
+      }
+      .weather-icon-temps {
+        display: flex;
+      }
+
+      .temperature {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+</head>
+<body>
+<div class="main-content">
+<h1>Weather</h1>
+<p>Search a location or press find my location to get your weather info.</p>
+<input type="search" id="search" name="search"
+aria-label="Get weather for this location">
+
+<button onclick="getLongLat()">Get weather for this location</button>
+
+<button onclick="getLocation()">Get my location</button>
+
+<h3 id="location"></h3>
+</div>
+</body>
+<script>
+  var x = document.getElementById("demo");
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    }
+    else {
+      x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+  }
+
+  function showPosition(position) {
+    getLocationName(position.coords.longitude, position.coords.latitude);
+    getWeather(position.coords.longitude, position.coords.latitude);
+  }
+
+  async function getLocationName(longitude, latitude) {
+    const APIKey = "a11da27719db29aa00c217cf600bd197";
+    const searchTerm = latitude + "," + longitude;
+    const response = await fetch(`http://api.positionstack.com/v1/reverse?access_key=${APIKey}&query=${searchTerm}`, {mode: 'cors'});
+    const locationData = await response.json();
+
+    const label = locationData.data[0].label
+    assignLocationName(label);
+  }
+
+  function assignLocationName(label) {
+    const locationTag = document.getElementById("location");
+    locationTag.textContent = label;
+  }
+
+  async function getLongLat() {
+    const APIKey = "a11da27719db29aa00c217cf600bd197";
+    let searchTerm = document.getElementById("search").value;
+    const response = await fetch(`http://api.positionstack.com/v1/forward?access_key=${APIKey}&query=${searchTerm}`, {mode: 'cors'});
+    const locationData = await response.json();
+
+    const label = locationData.data[0].label
+    const longitude = locationData.data[0].longitude
+    const latitude = locationData.data[0].latitude
+
+    assignLocationName(label);
+    getWeather(longitude, latitude)
+  }
+
+  async function getWeather(lon, lat) {
+    const APIKey = "132fae47c1d7bf160203aab8c6714bdf";
+    const exclude = "minutely, alerts";
+    const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=${exclude}&appid=${APIKey}&units=metric`, {mode: 'cors'});
+    const weatherData = await response.json();
+    console.log(weatherData);
+    // Create current weather div.
+    let currentWeatherData = document.createElement("div");
+    currentWeatherData.classList.add("current-weather-data");
+    createWeatherDiv(weatherData.current, currentWeatherData);
+    document.body.appendChild(currentWeatherData);
+
+    // Create weekly weather data div.
+    let weeklyWeatherData = document.createElement("div");
+    weeklyWeatherData.classList.add("weekly-weather-data");
+    weatherData.daily.forEach(function (day) {
+      createWeatherDiv(day, weeklyWeatherData);
+    });
+
+    document.body.appendChild(weeklyWeatherData);
+  }
+
+  function dateTimeFromWeather(unixtime) {
+    const milliseconds = unixtime * 1000;
+    const dateObject = new Date(milliseconds);
+    const humanDateFormat = dateObject.toLocaleString();
+
+    return dateObject;
+  }
+
+  function getWeatherIconURL(id) {
+    return `https://openweathermap.org/img/wn/${id}@2x.png`
+  }
+
+  function createWeatherDiv(weather, tag) {
+    let dateTimeOptions = {  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour12: false };
+
+    // Create parent container.
+    const content = document.createElement("div");
+    content.classList.add("weather");
+
+    // Create and set date div.
+    let dateTime = dateTimeFromWeather(weather.dt);
+    let dateTimeText = document.createElement("div");
+    dateTimeText.classList.add("weather-date");
+    dateTimeText.textContent = dateTime.toLocaleString("en-GB", dateTimeOptions);
+    content.appendChild(dateTimeText);
+
+    // Create parent div for icon and high/low temps.
+    const IconAndHighLowTemps = document.createElement("div");
+    IconAndHighLowTemps.classList.add("weather-icon-temps");
+
+    // Create and set icon img.
+    let img = document.createElement("img");
+    img.classList.add("weather-icon");
+    img.src = getWeatherIconURL(weather.weather[0].icon);
+    IconAndHighLowTemps.appendChild(img);
+
+    // Create parent div for icon and high/low temps.
+    const HighLowTemps = document.createElement("div");
+    HighLowTemps.classList.add("weather-high-low-temps");
+
+    let temperatureHigh = document.createElement("div");
+    temperatureHigh.classList.add("temperature-high");
+    if (weather.temp.max) {
+      temperatureHigh.textContent = "High: " + weather.temp.max + "°C";
+    }
+    HighLowTemps.appendChild(temperatureHigh);
+
+    let temperatureLow = document.createElement("div");
+    temperatureLow.classList.add("temperature-low");
+    if (weather.temp.min) {
+      temperatureLow.textContent = "Low: " + weather.temp.min + "°C";
+    }
+    HighLowTemps.appendChild(temperatureLow);
+    IconAndHighLowTemps.appendChild(HighLowTemps);
+    content.appendChild(IconAndHighLowTemps);
+
+    // Create and set day temperature div.
+    let temperature = document.createElement("div");
+    temperature.classList.add("temperature");
+    if (weather.temp.day) {
+      temperature.textContent = weather.temp.day + "°C";
+    }
+    if (weather.temp && !weather.temp.day) {
+      temperature.textContent = weather.temp + "°C";
+    }
+    content.appendChild(temperature);
+
+    // Create and set description div.
+    let description = document.createElement("div");
+    description.classList.add("weather-description");
+    description.textContent = weather.weather[0].description;
+    content.appendChild(description);
+
+    tag.appendChild(content);
+  }
+
+</script>
+</html>
