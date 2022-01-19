@@ -93,14 +93,15 @@
     <p>Search a location or press find my location to get your weather info.</p>
     <input type="search" id="search" name="search">
 
-    <button onclick="getLongLat()">Get weather for this location</button>
-    <button onclick="getLocation()">Get my location</button>
+    <button onclick="getLongLat()">Search weather for this location</button>
+    <button onclick="getLocation()">Search my location</button>
 
     <h3 id="location"></h3>
 </div>
 </body>
 <script>
 
+  // Uses browsers location API.
   function getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition);
@@ -110,13 +111,14 @@
     }
   }
 
+  // Callback function when using location API.
   function showPosition(position) {
     document.getElementById("loader").classList.remove("hide");
-
     getLocationName(position.coords.longitude, position.coords.latitude);
     getWeather(position.coords.longitude, position.coords.latitude);
   }
 
+  // Gets the name of a location from a long and lat.
   async function getLocationName(longitude, latitude) {
     const APIKey = "57cdd277e797011e6b3e675f9e1108bf3b84e0c6";
     try {
@@ -135,11 +137,13 @@
     }
   }
 
+  // Assigns the location name.
   function assignLocationName(label) {
     const locationTag = document.getElementById("location");
     locationTag.textContent = label;
   }
 
+  // Gets the long and lat from a search term.
   async function getLongLat() {
     const geocodifyAPIKey = "57cdd277e797011e6b3e675f9e1108bf3b84e0c6";
     let searchTerm = document.getElementById("search").value;
@@ -170,6 +174,7 @@
     }
   }
 
+  // Gets weather data for a given long and lat.
   async function getWeather(longitude, latitude) {
     const openWeatherMapAPIKey = "132fae47c1d7bf160203aab8c6714bdf";
     const exclude = "minutely, alerts";
@@ -190,14 +195,12 @@
       }
 
       // Create current weather div.
-      let currentWeatherData = document.createElement("div");
-      currentWeatherData.classList.add("current-weather-data");
+      let currentWeatherData = tagFactory("div", "current-weather-data");
       createWeatherDiv(weatherData.current, currentWeatherData);
       document.body.appendChild(currentWeatherData);
 
       // Create weekly weather data div.
-      let weeklyWeatherData = document.createElement("div");
-      weeklyWeatherData.classList.add("weekly-weather-data");
+      let weeklyWeatherData = tagFactory("div", "weekly-weather-data");
       weatherData.daily.forEach(function (day) {
         createWeatherDiv(day, weeklyWeatherData);
       });
@@ -212,16 +215,19 @@
     }
   }
 
+  // Returns a JS date object from unixtime given from API.
   function dateTimeFromWeather(unixtime) {
     const milliseconds = unixtime * 1000;
     const dateObject = new Date(milliseconds);
     return dateObject;
   }
 
+  // Turns the OpenWeatherMap icon id into a full URL.
   function getWeatherIconURL(id) {
     return `https://openweathermap.org/img/wn/${id}@4x.png`
   }
 
+  // Creates the weather div for a given day, uses OpenWeatherMap JSON structure.
   function createWeatherDiv(weather, tag) {
     let dateTimeOptions = {weekday: 'long', month: 'long', day: 'numeric', hour12: false};
 
@@ -275,6 +281,7 @@
     tag.appendChild(content);
   }
 
+  // Creates a given tag with class name and text content.
   function tagFactory(tag, className, textContent) {
     if (tag) {
       let newTag = document.createElement(tag);
@@ -288,6 +295,7 @@
     }
   }
 
+  // Displays an error message for 3 seconds in place of the location heading.
   async function unableToFindLocation(message) {
     const messageField = document.getElementById("location");
     const currentText = messageField.innerHTML;
