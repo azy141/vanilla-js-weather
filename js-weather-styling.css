@@ -1,0 +1,101 @@
+html {
+  background: lightskyblue;
+}
+.main-content {
+  text-align: center;
+}
+
+.current-weather-data {
+  display: flex;
+  justify-content: center;
+}
+
+.weekly-weather-data {
+  display: flex;
+}
+
+.weather {
+  padding: 20px;
+}
+
+.weather-description {
+  text-transform: capitalize;
+  display: flex;
+  justify-content: center;
+}
+
+.weekly-weather-data {
+  display: flex;
+  justify-content: center;
+  background: white;
+  border-radius: 25px;
+  padding: 20px;
+  filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.2));
+}
+.weather:not(:last-child){
+  border-right: 5px solid gainsboro;
+}
+
+.weather-icon {
+  width: 60%;
+}
+.weather-high-low-temps {
+  width: 40%;
+  margin-top: 20px;
+}
+.weather-icon-temps {
+  display: flex;
+}
+
+.temperature {
+  display: flex;
+  justify-content: center;
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 6px solid #3498db;
+  width: 24px;
+  height: 24px;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hide {
+  display: none;
+}
+
+.buttons-container {
+  margin-top: 1rem;
+}
+
+input[type=search] {
+  width: 25rem;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  box-sizing: border-box;
+}
+
+button {
+  border-radius: 5px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+  margin: 0 1rem;
+  cursor: pointer;
+}
