@@ -173,15 +173,17 @@ function createWeatherDiv(weather, tag) {
   let temperatureHigh = tagFactory("div", "temperature-high");
   if (weather.temp.max) {
     temperatureHigh.textContent = "High: " + weather.temp.max + unit;
+    highLowTemps.appendChild(temperatureHigh);
   }
-  highLowTemps.appendChild(temperatureHigh);
 
   let temperatureLow = tagFactory("div", "temperature-low");
   if (weather.temp.min) {
     temperatureLow.textContent = "Low: " + weather.temp.min + unit;
+    highLowTemps.appendChild(temperatureLow);
   }
-  highLowTemps.appendChild(temperatureLow);
-  iconAndHighLowTemps.appendChild(highLowTemps);
+  if (weather.temp.max || weather.temp.min) {
+    iconAndHighLowTemps.appendChild(highLowTemps);
+  }
   content.appendChild(iconAndHighLowTemps);
 
   // Create and set day temperature div.

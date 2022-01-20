@@ -5,10 +5,18 @@ html {
   text-align: center;
 }
 
+.weather-date {
+  text-align: center;
+}
+
 .current-weather-data {
   text-align: center;
   width: fit-content;
   margin: auto;
+}
+
+.current-weather-data .weather-icon-temps {
+  justify-content: center
 }
 
 .weekly-weather-data {
