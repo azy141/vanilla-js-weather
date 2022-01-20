@@ -1,3 +1,20 @@
+let unitSystem = "metric";
+document.getElementById("unit-switch").addEventListener("change", function () {
+  if (this.checked) {
+    unitSystem = "metric";
+  } else {
+    unitSystem = "imperial";
+  }
+})
+
+function getUnitSymbol() {
+  if (unitSystem == "metric") {
+    return "°C";
+  }
+  if (unitSystem = "imperial") {
+    return "°F";
+  }
+}
 
 // Uses browsers location API.
 function getLocation() {
@@ -79,7 +96,7 @@ async function getWeather(longitude, latitude) {
 
   try {
     document.getElementById("loader").classList.remove("hide");
-    const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=${exclude}&appid=${openWeatherMapAPIKey}&units=metric`, {mode: 'cors'});
+    const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=${exclude}&appid=${openWeatherMapAPIKey}&units=${unitSystem}`, {mode: 'cors'});
     const weatherData = await response.json();
 
     // Check if there's already weather data showing.
@@ -93,7 +110,7 @@ async function getWeather(longitude, latitude) {
     }
 
     // Create current weather div.
-    let currentWeatherData = tagFactory("div", "current-weather-data");
+    let currentWeatherData = tagFactory("div", "current-weather-data", "Current");
     createWeatherDiv(weatherData.current, currentWeatherData);
     document.body.appendChild(currentWeatherData);
 
@@ -127,8 +144,13 @@ function getWeatherIconURL(id) {
 
 // Creates the weather div for a given day, uses OpenWeatherMap JSON structure.
 function createWeatherDiv(weather, tag) {
-  let dateTimeOptions = {weekday: 'long', month: 'long', day: 'numeric', hour12: false};
-
+  let dateTimeOptions = {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    hour12: false
+  };
+  let unit = getUnitSymbol();
   // Create parent container.
   const content = tagFactory("div", "weather");
 
@@ -150,13 +172,13 @@ function createWeatherDiv(weather, tag) {
 
   let temperatureHigh = tagFactory("div", "temperature-high");
   if (weather.temp.max) {
-    temperatureHigh.textContent = "High: " + weather.temp.max + "°C";
+    temperatureHigh.textContent = "High: " + weather.temp.max + unit;
   }
   highLowTemps.appendChild(temperatureHigh);
 
   let temperatureLow = tagFactory("div", "temperature-low");
   if (weather.temp.min) {
-    temperatureLow.textContent = "Low: " + weather.temp.min + "°C";
+    temperatureLow.textContent = "Low: " + weather.temp.min + unit;
   }
   highLowTemps.appendChild(temperatureLow);
   iconAndHighLowTemps.appendChild(highLowTemps);
@@ -165,10 +187,10 @@ function createWeatherDiv(weather, tag) {
   // Create and set day temperature div.
   let temperature = tagFactory("div", "temperature");
   if (weather.temp.day) {
-    temperature.textContent = weather.temp.day + "°C";
+    temperature.textContent = weather.temp.day + unit;
   }
   if (weather.temp && !weather.temp.day) {
-    temperature.textContent = weather.temp + "°C";
+    temperature.textContent = weather.temp + unit;
   }
   content.appendChild(temperature);
 
